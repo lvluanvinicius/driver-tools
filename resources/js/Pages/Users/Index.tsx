@@ -1,7 +1,9 @@
 import { TablePaginate } from '@/components/table-paginate';
+import { Button } from '@/components/ui/button';
 import { DefaultApp } from '@/layouts/DefaultApp';
 import { ApiResponse } from '@/types/api';
 import { UserInterface } from '@/types/user';
+import { Link } from '@inertiajs/react';
 import { TableUsers } from './components/table-users';
 
 interface UsersProps {
@@ -14,7 +16,11 @@ export default function Users({ data }: UsersProps) {
             <div className="mb-4 flex w-full items-center justify-between">
                 <div className="justify-end">teste</div>
 
-                <div className="flex items-center gap-2">teste</div>
+                <div className="flex items-center gap-2">
+                    <Link href={route('app.users.create')}>
+                        <Button>+ Novo</Button>
+                    </Link>
+                </div>
             </div>
             <TableUsers data={data.data} />
             <div className="mt-4 px-4 py-2">

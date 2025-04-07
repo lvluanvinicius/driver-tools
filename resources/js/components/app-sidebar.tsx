@@ -1,10 +1,4 @@
-import {
-    Files,
-    HardDrive,
-    LayoutDashboardIcon,
-    SettingsIcon,
-    Users,
-} from 'lucide-react';
+import { Files, HardDrive, Users } from 'lucide-react';
 import * as React from 'react';
 
 import { NavMain } from '@/components/nav-main';
@@ -22,11 +16,11 @@ import {
 
 const data = {
     navMain: [
-        {
-            title: 'Painel',
-            url: route('app.dashboard'),
-            icon: LayoutDashboardIcon,
-        },
+        // {
+        //     title: 'Painel',
+        //     url: route('app.dashboard'),
+        //     icon: LayoutDashboardIcon,
+        // },
         {
             title: 'Arquivos',
             url: route('app.files.index'),
@@ -34,11 +28,11 @@ const data = {
         },
     ],
     navSecondary: [
-        {
-            title: 'Configurações',
-            url: '#',
-            icon: SettingsIcon,
-        },
+        // {
+        //     title: 'Configurações',
+        //     url: '#',
+        //     icon: SettingsIcon,
+        // },
         {
             title: 'Usuários',
             url: route('app.users.index'),
