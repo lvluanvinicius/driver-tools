@@ -28,4 +28,6 @@ Route::middleware('auth')->as('app.')->group(function () {
     Route::resource('users', UserController::class);
 
     Route::resource('profile', ProfileController::class);
+
+    Route::delete('/sign-out', [SignInController::class, 'signOut'])->name('sign-out');
 });

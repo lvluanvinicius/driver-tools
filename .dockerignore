@@ -3,3 +3,4 @@ vendor
 bootstrap/cache/*
 public/build
 public/hot
+.env

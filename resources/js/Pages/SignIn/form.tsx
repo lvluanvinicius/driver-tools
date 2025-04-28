@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
 
 export function Form() {
@@ -16,6 +16,7 @@ export function Form() {
 
     return (
         <div className="border-3 fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
+            <Head title="Login" />
             <form
                 onSubmit={handleSignIn}
                 className="flex h-[20rem] w-[25rem] flex-col justify-center gap-4 rounded-xl border px-8 shadow shadow-black/30 dark:bg-secondary dark:shadow-black"

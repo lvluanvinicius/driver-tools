@@ -54,6 +54,9 @@ COPY . .
 # Instalando dependências.
 RUN npm install
 
+# Copindo env de exemplo para produção.
+RUN cp .env.example .env
+
 # Altera o valor da URL de aplicativo.
 RUN sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env
 RUN sed -i "s|^APP_ENV=.*|APP_ENV=${APP_ENV}|" .env
@@ -67,7 +70,7 @@ RUN composer install
 
 # Alterando permissões do projeto.
 RUN chown -R www-data:www-data ./ && chmod 775 -R ./ && chmod 777 -R storage
-RUN php artisan storage:link
+RUN php artisan key:gen && php artisan storage:link
 
 # Expor a porta padrão do PHP-FPM
 EXPOSE 9000

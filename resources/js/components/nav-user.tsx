@@ -16,7 +16,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 
 export function NavUser() {
     const { auth } = usePage().props;
@@ -85,7 +85,10 @@ export function NavUser() {
                             </Link>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => router.delete(route('app.sign-out'))}
+                        >
                             <LogOutIcon />
                             Sair
                         </DropdownMenuItem>
