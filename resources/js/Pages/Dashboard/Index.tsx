@@ -1,9 +1,10 @@
 import { DefaultApp } from '@/layouts/DefaultApp';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 export function Page() {
     return (
         <DefaultApp>
+            <Head title="Painel" />
             <div>
                 <h1 className="text-2xl font-bold">Bem vindo!</h1>
                 <h3>

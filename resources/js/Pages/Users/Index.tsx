@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DefaultApp } from '@/layouts/DefaultApp';
 import { ApiResponse } from '@/types/api';
 import { UserInterface } from '@/types/user';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { TableUsers } from './components/table-users';
 
 interface UsersProps {
@@ -13,8 +13,9 @@ interface UsersProps {
 export default function Users({ data }: UsersProps) {
     return (
         <DefaultApp>
+            <Head title="Usuários" />
             <div className="mb-4 flex w-full items-center justify-between">
-                <div className="justify-end">teste</div>
+                <div className="justify-end">Usuários</div>
 
                 <div className="flex items-center gap-2">
                     <Link href={route('app.users.create')}>

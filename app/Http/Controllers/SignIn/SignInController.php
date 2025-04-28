@@ -11,8 +11,12 @@ use Inertia\Response as InertiaResponse;
 
 class SignInController extends Controller
 {
-    public function index(): InertiaResponse
+    public function index(): InertiaResponse | RedirectResponse
     {
+        if (Auth::check()) {
+            return redirect()->intended(route('app.dashboard', absolute: false));
+        }
+
         return Inertia::render('SignIn/Index');
     }
 

@@ -1,6 +1,7 @@
 import { LinkProps, NavigatePages } from '@/components/navgate-pages';
 import { DefaultApp } from '@/layouts/DefaultApp';
 import { UserInterface } from '@/types/user';
+import { Head } from '@inertiajs/react';
 import { FormEdit } from './components/form-edit';
 
 export default function Edit({ user }: { user: UserInterface }) {
@@ -19,6 +20,8 @@ export default function Edit({ user }: { user: UserInterface }) {
 
     return (
         <DefaultApp>
+            <Head title={user.name} />
+
             <div className="w-full">
                 <NavigatePages links={links} />
             </div>

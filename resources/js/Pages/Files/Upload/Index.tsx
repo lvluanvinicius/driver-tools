@@ -3,7 +3,7 @@ import { FileInterface } from '@/types/file';
 import Dropzone from 'dropzone';
 import { useEffect, useRef } from 'react';
 
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import 'dropzone/dist/dropzone.css';
 import { Undo2 } from 'lucide-react';
 
@@ -82,6 +82,7 @@ export default function FileUploader({ uuid, folder }: FileUploaderInterface) {
 
     return (
         <DefaultApp>
+            <Head title="Novo Arquivo" />
             <div className="flex flex-col justify-center">
                 <Link
                     href={

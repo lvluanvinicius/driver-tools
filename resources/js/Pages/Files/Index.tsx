@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DefaultApp } from '@/layouts/DefaultApp';
 import { ApiResponse } from '@/types/api';
 import { FileInterface } from '@/types/file';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Folder } from 'lucide-react';
 import { FolderCreate } from './components/folder-create';
 import { TableFiles } from './components/table-files';
@@ -24,6 +24,7 @@ export default function FileUploader({
 
     return (
         <DefaultApp>
+            <Head title="Arquivos" />
             <div className="mb-4 flex w-full items-center justify-between">
                 <div className="justify-end">
                     {parent ? (

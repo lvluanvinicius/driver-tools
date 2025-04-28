@@ -1,5 +1,6 @@
 import { LinkProps, NavigatePages } from '@/components/navgate-pages';
 import { DefaultApp } from '@/layouts/DefaultApp';
+import { Head } from '@inertiajs/react';
 import { FormCreate } from './components/form-update';
 
 export default function Create() {
@@ -18,6 +19,7 @@ export default function Create() {
 
     return (
         <DefaultApp>
+            <Head title="Novo Usuário" />
             <div className="w-full">
                 <NavigatePages links={links} />
             </div>
