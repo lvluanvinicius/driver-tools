@@ -1,0 +1,5 @@
+node_modules
+vendor
+bootstrap/cache/*
+public/build
+public/hot

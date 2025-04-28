@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SignIn\SignInController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
@@ -25,4 +26,6 @@ Route::middleware('auth')->as('app.')->group(function () {
     Route::resource('files', FileController::class);
 
     Route::resource('users', UserController::class);
+
+    Route::resource('profile', ProfileController::class);
 });

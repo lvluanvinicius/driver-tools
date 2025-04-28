@@ -16,7 +16,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 export function NavUser() {
     const { auth } = usePage().props;
@@ -77,10 +77,12 @@ export function NavUser() {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <UserCircleIcon />
-                                Meu Perfil
-                            </DropdownMenuItem>
+                            <Link href={route('app.profile.index')}>
+                                <DropdownMenuItem className="cursor-pointer">
+                                    <UserCircleIcon />
+                                    Meu Perfil
+                                </DropdownMenuItem>
+                            </Link>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>

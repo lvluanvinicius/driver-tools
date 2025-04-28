@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class UserController extends Controller
 {
@@ -14,10 +15,13 @@ class UserController extends Controller
     {
 
     }
+
     /**
-     * Display a listing of the resource.
+     * Retorna a listagem de usuários.
+     *
+     * @return InertiaResponse
      */
-    public function index()
+    public function index(): InertiaResponse
     {
         $users = $this->modelUser->paginate(10);
 
@@ -28,9 +32,11 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Retorna o display de criação de um novo usuário.
+     *
+     * @return InertiaResponse
      */
-    public function create()
+    public function create(): InertiaResponse
     {
         return Inertia::render('Users/Create');
     }
@@ -41,6 +47,7 @@ class UserController extends Controller
      *
      * @param UserCreateRequest $request
      * @return RedirectResponse
+     * @throws Exception
      */
     public function store(UserCreateRequest $request): RedirectResponse
     {
@@ -63,17 +70,14 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Retorna o display de edição de usuário.
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
+     * @param string $uuid
+     * @return InertiaResponse | RedirectResponse
+     * @throws Exception
      */
-    public function show(string $uuid)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $uuid)
+    public function edit(string $uuid): InertiaResponse | RedirectResponse
     {
         try {
             if (! $user = $this->modelUser->where('uuid', $uuid)->first()) {
@@ -98,6 +102,7 @@ class UserController extends Controller
      * @param Request $request
      * @param string $uuid
      * @return RedirectResponse
+     * @throws Exception
      */
     public function update(Request $request, string $uuid): RedirectResponse
     {
@@ -119,7 +124,7 @@ class UserController extends Controller
             }
 
             return to_route('app.users.index')->with([
-                'success' => 'Usuário criado com sucesso!',
+                'success' => 'Usuário atualizado com sucesso!',
             ]);
 
         } catch (\Exception $error) {
@@ -135,6 +140,7 @@ class UserController extends Controller
      *
      * @param string $uuid
      * @return RedirectResponse
+     * @throws Exception
      */
     public function destroy(string $uuid): RedirectResponse
     {
