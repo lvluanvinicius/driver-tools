@@ -3,6 +3,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { UserInterface } from '@/types/user';
 import { Link } from '@inertiajs/react';
 import { Edit } from 'lucide-react';
+import { UserDelete } from './user-delete';
 
 export function TableUsersRow({ data }: { data: UserInterface }) {
     return (
@@ -24,6 +25,8 @@ export function TableUsersRow({ data }: { data: UserInterface }) {
                                 <Edit />
                             </Button>
                         </Link>
+
+                        <UserDelete user={data.uuid} />
                     </div>
                 </div>
             </TableCell>
