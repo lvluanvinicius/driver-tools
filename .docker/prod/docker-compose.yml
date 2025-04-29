@@ -1,6 +1,6 @@
 services:
     drive-tools:
-        image: drive-tools:1.0
+        image: docker-registry.grupocednet.com.br/drive-tools:1.0
         build:
             context: ../../
             dockerfile: .docker/prod/Dockerfile

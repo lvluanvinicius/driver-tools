@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => Authenticate::class,
         ]);
+
+        $middleware->trustProxies('*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
