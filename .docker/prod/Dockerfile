@@ -1,5 +1,7 @@
 FROM php:8.4-fpm
 
+USER root
+
 # Argumento para configurar a versão do Node.js
 ARG NODE_VERSION=22
 ARG APP_URL=http://localhost

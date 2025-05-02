@@ -2,6 +2,7 @@
 
 # App Environments.
 APP_URL=${APP_URL:-https://localhost}
+APP_NAME=${APP_NAME:-Laravel}
 APP_ENV=${APP_ENV:-production}
 APP_DEBUG=${APP_DEBUG:-false}
 APP_TIMEZONE=${APP_TIMEZONE:-UTC}
@@ -26,6 +27,7 @@ echo "memory_limit = ${PHP_MEMORY_LIMIT}" >> /usr/local/etc/php/conf.d/1-custon.
 
 # Altera o APP_URL diretamente no .env
 sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env
+sed -i "s|^APP_NAME=.*|APP_NAME=${APP_NAME}|" .env
 sed -i "s|^APP_ENV=.*|APP_ENV=${APP_ENV}|" .env
 sed -i "s|^APP_DEBUG=.*|APP_DEBUG=${APP_DEBUG}|" .env
 sed -i "s|^APP_TIMEZONE=.*|APP_TIMEZONE=${APP_TIMEZONE}|" .env
