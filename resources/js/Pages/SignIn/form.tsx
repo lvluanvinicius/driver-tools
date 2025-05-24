@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
 
-export function Form() {
+export function Form({ error }: { error: null | string }) {
     const { post, setData, data, errors } = useForm({
         username: '',
         password: '',
@@ -58,6 +58,10 @@ export function Form() {
                         }
                     />
                 </div>
+
+                {error && (
+                    <p className="text-center text-xs text-red-500">{error}</p>
+                )}
 
                 <div className="flex flex-col gap-2">
                     <Button>Entrar</Button>

@@ -3,16 +3,17 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\Integration\SignInController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SignIn\SignInController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\Integration\Authenticated;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/sign-in', [SignInController::class, 'index'])->name('sign-in');
 Route::post('/sign-in', [SignInController::class, 'store'])->name('sign-in.store');
 
-Route::middleware('auth')->as('app.')->group(function () {
+Route::middleware([Authenticated::class])->as('app.')->group(function () {
     Route::get('', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('files/upload/{uuid?}', [UploadController::class, 'index'])->name('files.upload');

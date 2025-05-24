@@ -28,7 +28,7 @@ class Files extends Model
      */
     protected static function booted()
     {
-        static::creating(fn(Files $user) => $user->uuid = (string) Str::uuid());
+        static::creating(fn(Files $file) => $file->uuid = (string) Str::uuid());
     }
 
     public function parent()
