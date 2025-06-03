@@ -70,7 +70,7 @@ RUN rm -rf /var/www/html/*
 
 # 7. Clona o repositório privado (pode adaptar para HTTPS se necessário)
 # (Requer --mount=type=ssh em buildkit)
-RUN --mount=type=ssh git clone --branch ${GIT_VERSION} git@github.com:cednetdev/cednet-integrations.git .
+RUN --mount=type=ssh git clone --branch ${GIT_VERSION} git@github.com:lvluanvinicius/driver-tools.git .
 
 # 8. Copia .env.example para .env
 RUN cp .env.example .env
