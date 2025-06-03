@@ -1,0 +1,15 @@
+services:
+    cednet_driver:
+        image: docker-registry.grupocednet.com.br/cednet-driver:1.0
+        build:
+            dockerfile: Dockerfile
+            args:
+                - GIT_VERSION=v1.0
+            ssh:
+                - default
+        secrets:
+            - ssh_key
+
+secrets:
+    ssh_key:
+        file: ~/.ssh/id_rsa

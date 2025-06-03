@@ -6,7 +6,7 @@ APP_NAME=${APP_NAME:-Laravel}
 APP_ENV=${APP_ENV:-production}
 APP_DEBUG=${APP_DEBUG:-false}
 APP_TIMEZONE=${APP_TIMEZONE:-UTC}
-DRIVER_STORAGE_PATH=${DRIVER_STORAGE_PATH:-/storage/cednet-applicacoes/driver-tool}
+DRIVER_STORAGE_PATH=${DRIVER_STORAGE_PATH:-/data/driver-tool}
 
 # PHP Environments
 PHP_MAX_EXECUTION_TIME=${PHP_MAX_EXECUTION_TIME:-30}
