@@ -15,6 +15,8 @@ class SignInController extends Controller
     }
 
     /**
+     * @author Luan Santos <lvluansantos@gmail.com>
+     *
      * @param \App\Http\Requests\Integration\SignInRequest $request
      * @return mixed|RedirectResponse
      */

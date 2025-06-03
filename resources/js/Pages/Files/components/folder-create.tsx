@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 
 interface FolderCreateProps {
     parentId: string | null;
@@ -25,22 +25,20 @@ export function FolderCreate({ parentId }: FolderCreateProps) {
         ? route('app.files.folder.store', parentId)
         : route('app.files.folder.store');
 
-    const { data, setData, errors, post, recentlySuccessful, reset } = useForm({
+    const { data, setData, errors, post, reset, processing } = useForm({
         name: '',
     });
 
     function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        post(routeCreate);
-        reset();
+        post(routeCreate, {
+            onSuccess() {
+                reset();
+                setOpen(false);
+            },
+        });
     }
-
-    useEffect(() => {
-        if (recentlySuccessful) {
-            setOpen(false);
-        }
-    }, [recentlySuccessful]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -77,7 +75,7 @@ export function FolderCreate({ parentId }: FolderCreateProps) {
                     <DialogFooter>
                         <DialogClose className="h-8">Cancelar</DialogClose>
                         <Button className="h-8 min-w-[5rem]" type="submit">
-                            Criar
+                            {processing ? 'Aguarde...' : 'Criar'}
                         </Button>
                     </DialogFooter>
                 </form>

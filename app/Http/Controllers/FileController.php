@@ -1,11 +1,12 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Jobs\DestroyFilesJob;
 use App\Models\Files;
+use App\Services\Integration;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -26,19 +27,12 @@ class FileController extends Controller
      */
     public function index(Request $request, string | null $uuid = null): InertiaResponse
     {
-        $currentFolder = $this->modelFiles->where('uuid', $uuid)->where('is_folder', 'Y')->first() ?: null;
-
-        $data = $this->modelFiles->query()
-            ->where('parent_id', $currentFolder?->id)
-            ->orderByRaw("CASE WHEN is_folder = 'Y' THEN 0 ELSE 1 END")
-            ->orderBy('name', 'desc')
-            ->paginate(10);
-
-        $breadcrumbs = $currentFolder?->path_to_root ?? collect();
+        $integration = new Integration();
+        $data        = $integration->files($request->session()->get('token'), $uuid, $request->only('page', 'paginate', 'search'));
 
         return Inertia::render('Files/Index', [
-            'data'        => $data,
-            'breadcrumbs' => $breadcrumbs,
+            'data'        => $data['data'],
+            'breadcrumbs' => $data['breadcrumbs'],
             'uuid'        => $uuid,
         ]);
     }
@@ -54,38 +48,45 @@ class FileController extends Controller
      */
     public function store(Request $request, string | null $uuid = null): RedirectResponse
     {
-
-        // Recupera a pasta atual se estiver dentro de uma pasta.
-        $currentFolder = $this->modelFiles->where('uuid', $uuid)->where('is_folder', 'Y')->first() ?: null;
-
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
+        $data = $request->only(['name']);
+
         try {
-            $data = [
-                'name'      => $request->name,
-                'user_id'   => $request->user()->id,
-                'is_folder' => 'Y',
-                'path'      => null,
-                'parent_id' => $currentFolder?->id,
-            ];
+            $data['isFile'] = 'N';
 
-            if ($request->has('parent_id')) {
-                $data['parent_id'] = $request->parent_id;
-            }
+            $integration = new Integration();
 
-            $this->modelFiles->create($data);
+            $create = $integration->fileCreate($request->session()->get('token'), $uuid, $data);
 
-            if ($uuid) {
-                return to_route("app.files.folder.index", ['uuid' => $uuid])->with([
-                    "success" => "Pasta criada com sucesso.",
+            if (isset($create['status_code']) && $create['status_code'] === 422) {
+                return redirect()->back()->withErrors($create['errors'])->with([
+                    'error' => $create['error'],
                 ]);
             }
 
-            return to_route("app.files.index")->with([
-                "success" => "Pasta criada com sucesso.",
-            ]);
+            if (isset($create['error'])) {
+                return redirect()->back()->with([
+                    'error' => $create['error'],
+                ]);
+            }
+
+            if (isset($create['status_code']) && $create['status_code'] === 200) {
+                if ($uuid) {
+                    return to_route("app.files.folder.index", ['uuid' => $uuid])->with([
+                        "success" => $create['message'],
+                    ]);
+                }
+
+                return to_route("app.files.index")->with([
+                    "success" => $create['message'],
+                ]);
+
+            }
+
+            throw new \Exception('Houve um erro desconhecido durante sua solicitação, por favor, tente novamente mais tarde.');
         } catch (\Exception $error) {
             return Redirect::back()->with([
                 'error' => $error->getMessage(),
@@ -105,29 +106,43 @@ class FileController extends Controller
      */
     public function update(Request $request, string $uuid, string | null $parent = null): RedirectResponse
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $data = $request->only(['name']);
+
         try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-            ]);
+            $integration = new Integration();
 
-            if (! $file = $this->modelFiles->where('uuid', $uuid)->first()) {
-                throw new \Exception('Arquivo não encontrado.');
-            }
+            $create = $integration->fileUpdate($request->session()->get('token'), $uuid, $parent, $data);
 
-            if (! $file->update(['name' => $request->name])) {
-                throw new \Exception('Houve um erro ao editar os registros em banco.');
-            }
-
-            if ($parent) {
-                return to_route("app.files.folder.index", ['uuid' => $parent])->with([
-                    "success" => ($file->is_folder == 'Y' ? 'Pasta' : 'Arquivo') . " atualiz" . ($file->is_folder == 'Y' ? 'a' : 'o') . " com sucesso.",
+            if (isset($create['status_code']) && $create['status_code'] === 422) {
+                return redirect()->back()->withErrors($create['errors'])->with([
+                    'error' => $create['error'],
                 ]);
             }
 
-            return to_route("app.files.index")->with([
-                "success" => ($file->is_folder == 'Y' ? 'Pasta' : 'Arquivo') . " atualiz" . ($file->is_folder == 'Y' ? 'a' : 'o') . " com sucesso.",
-            ]);
+            if (isset($create['error'])) {
+                return redirect()->back()->with([
+                    'error' => $create['error'],
+                ]);
+            }
 
+            if (isset($create['status_code']) && $create['status_code'] === 200) {
+                if ($parent) {
+                    return to_route("app.files.folder.index", ['uuid' => $parent])->with([
+                        "success" => $create['message'],
+                    ]);
+                }
+
+                return to_route("app.files.index")->with([
+                    "success" => $create['message'],
+                ]);
+
+            }
+
+            throw new \Exception('Houve um erro desconhecido durante sua solicitação, por favor, tente novamente mais tarde.');
         } catch (\Exception $error) {
             return Redirect::back()->with([
                 'error' => $error->getMessage(),
@@ -139,35 +154,44 @@ class FileController extends Controller
      * Exclui um registro e o arquivo correspondente.
      * @author Luan Santos <lvluansantos@gmail.com>
      *
+     * @param Request $request
      * @param string $uuid
      * @param string | null $parent
      * @return RedirectResponse
      */
-    public function destroy(string $uuid, string | null $parent = null): RedirectResponse
+    public function destroy(Request $request, string $uuid, string | null $parent = null): RedirectResponse
     {
         try {
-            if (! $file = $this->modelFiles->where('uuid', $uuid)->first()) {
-                throw new \Exception('Arquivo não encontrado.');
-            }
+            $integration = new Integration();
 
-            $path     = $file->path;
-            $isFolder = $file->is_folder;
+            $delete = $integration->fileDelete($request->session()->get('token'), $uuid, $parent);
 
-            if (! $file->delete()) {
-                throw new \Exception('Houve um erro ao tentar excluír o arquivo.');
-            }
-
-            $isFolder == 'N' && Storage::disk('driver_tool')->delete($path);
-
-            if ($parent) {
-                return to_route("app.files.folder.index", ['uuid' => $parent])->with([
-                    "success" => ($isFolder == 'Y' ? 'Pasta' : 'Arquivo') . " excluíd" . ($isFolder == 'Y' ? 'a' : 'o') . " com sucesso.",
+            if (isset($delete['error'])) {
+                return redirect()->back()->with([
+                    'error' => $delete['error'],
                 ]);
             }
 
-            return to_route("app.files.index")->with([
-                "success" => ($isFolder == 'Y' ? 'Pasta' : 'Arquivo') . " excluíd" . ($isFolder == 'Y' ? 'a' : 'o') . " com sucesso.",
-            ]);
+            if (isset($delete['status_code']) && $delete['status_code'] === 200) {
+                if (isset($delete['data']) && isset($delete['data']['path'])) {
+                    if ($delete['data']['path'] != null) {
+                        DestroyFilesJob::dispatch($delete['data']['path']);
+                    }
+                }
+
+                if ($parent) {
+                    return to_route("app.files.folder.index", ['uuid' => $parent])->with([
+                        "success" => $delete['message'],
+                    ]);
+                }
+
+                return to_route("app.files.index")->with([
+                    "success" => $delete['message'],
+                ]);
+
+            }
+
+            throw new \Exception('Houve um erro desconhecido durante sua solicitação, por favor, tente novamente mais tarde.');
         } catch (\Exception $error) {
             $errorMessage = $error->getMessage();
 

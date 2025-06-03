@@ -46,7 +46,6 @@ RUN php -v && node -v && npm -v
 # Instale o Composer globalmente
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-
 # Definir o diretório de trabalho dentro do contêiner
 WORKDIR /var/www/html
 

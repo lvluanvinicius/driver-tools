@@ -19,6 +19,7 @@ Route::middleware([Authenticated::class])->as('app.')->group(function () {
     Route::get('files/upload/{uuid?}', [UploadController::class, 'index'])->name('files.upload');
     Route::get('files/{file}/download', [DownloadController::class, 'index'])->name('files.download');
     Route::get('files/folder/{uuid}', [FileController::class, 'index'])->name('files.folder.index');
+
     Route::post('files/upload/{uuid?}', [UploadController::class, 'store'])->name('files.upload');
     Route::post('files/{uuid?}', [FileController::class, 'store'])->name('files.folder.store');
     Route::put('files/{uuid}/{parent?}', [FileController::class, 'update'])->name('files.a.update');

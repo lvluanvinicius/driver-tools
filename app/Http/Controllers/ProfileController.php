@@ -1,9 +1,11 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Services\Integration;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Inertia\Response as InertiaResponse;
 
 class ProfileController extends Controller
 {
@@ -13,7 +15,7 @@ class ProfileController extends Controller
      * @param Request $request
      * @return void
      */
-    public function index(Request $request)
+    public function index(Request $request): InertiaResponse
     {
         $data = $request->user();
 
@@ -23,17 +25,16 @@ class ProfileController extends Controller
     }
 
     /**
-     * Atualiza o perfil de um usuário logado.
+     * Atualiza os dados do usuário logado.
      * @author Luan Santos <lvluansantos@gmail.com>
      *
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
+     * @throws \Exception
      * @return RedirectResponse
      */
     public function update(Request $request): RedirectResponse
     {
         try {
-            $user = $request->user();
-
             $data = $request->only(['username', 'password', 'email', 'name']);
 
             if (array_key_exists('password', $data)) {
@@ -42,16 +43,32 @@ class ProfileController extends Controller
                 }
             }
 
-            if (! $user->update($data)) {
-                throw new \Exception('Erro ao tentar criar a conta!');
+            $integration = new Integration();
+
+            $update = $integration->updateProfile($request->session()->get('token'), $data);
+
+            if (isset($update['status_code']) && $update['status_code'] === 422) {
+                return redirect()->back()->withErrors($update['errors'])->with([
+                    'error' => $update['error'],
+                ]);
             }
 
-            return to_route('app.profile.index')->with([
-                'success' => 'Perfil atualizado com sucesso!',
-            ]);
+            if (isset($update['error'])) {
+                return redirect()->back()->with([
+                    'error' => $update['error'],
+                ]);
+            }
+
+            if (isset($update['status_code']) && $update['status_code'] == 200) {
+                return to_route('app.profile.index')->with([
+                    'success' => $update['message'],
+                ]);
+            }
+
+            throw new \Exception('Houve um erro desconhecido durante sua solicitação, por favor, tente novamente mais tarde.');
 
         } catch (\Exception $error) {
-            return Redirect::back()->with([
+            return redirect()->back()->with([
                 'error' => $error->getMessage(),
             ]);
         }

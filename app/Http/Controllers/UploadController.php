@@ -2,8 +2,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Files;
+use App\Services\Integration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -17,9 +19,16 @@ class UploadController extends Controller
     {
     }
 
-    public function index(string | null $uuid = null): InertiaResponse
+    public function index(Request $request, string | null $uuid = null): InertiaResponse
     {
-        $currentFolder = $this->modelFiles->where('uuid', $uuid)->where('is_folder', 'Y')->first() ?: null;
+        $integration = new Integration();
+        $response    = $integration->getFolder($request->session()->get('token'), $uuid);
+
+        $currentFolder = null;
+
+        if (isset($response['status']) && $response['status'] && isset($response['data'])) {
+            $currentFolder = $response['data'];
+        }
 
         return Inertia::render('Files/Upload/Index', [
             'uuid'   => $uuid,
@@ -38,8 +47,14 @@ class UploadController extends Controller
     public function store(Request $request, string | null $uuid = null): JsonResponse
     {
         try {
-            // Recupera a pasta atual se estiver dentro de uma pasta.
-            $currentFolder = $this->modelFiles->where('uuid', $uuid)->where('is_folder', 'Y')->first() ?: null;
+            $integration = new Integration();
+            $response    = $integration->getFolder($request->session()->get('token'), $uuid);
+
+            $currentFolder = null;
+
+            if (isset($response['status']) && $response['status'] && isset($response['data'])) {
+                $currentFolder = $response['data'];
+            }
 
             $receiver = new FileReceiver('file', $request, HandlerFactory::classFromRequest($request));
 
@@ -67,8 +82,8 @@ class UploadController extends Controller
                 'type'      => $file->gettype(),
                 'mime_type' => $file->getMimeType(),
                 'ext'       => $file->getClientOriginalExtension(),
-                'parent_id' => $currentFolder?->id,
-                'user_id'   => $request->user()->id,
+                'parent_id' => $currentFolder ? $currentFolder['id'] : null,
+                'isFile'    => 'S',
             ];
 
             // Nome único para salvar o arquivo
@@ -77,16 +92,38 @@ class UploadController extends Controller
             // Armazena usando o driver definido.
             $data['path'] = $file->storeAs('', $fileName, 'driver_tool');
 
-            // Salva os dados no banco.
-            $create = $this->modelFiles->create($data);
-
-            // Exclui arquivo se não foi salvo no banco.
-            if (! $create) {
-                Storage::disk('driver_tool')->delete($fileName);
-                return response()->json(['error' => 'Erro ao salvar no banco.'], 500);
+            // Limpa o diretório do chunks.
+            if (File::isDirectory(storage_path('app/private/chunks'))) {
+                File::cleanDirectory(storage_path('app/private/chunks'));
             }
 
-            return $this->successResponse($create, 'Arquivos enviados com sucesso!');
+            // Salva os dados no banco.
+            $create = $integration->fileCreate($request->session()->get('token'), $uuid, $data);
+
+            if (isset($create['status_code']) && $create['status_code'] === 422) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $create['error'],
+                ], status: 400);
+            }
+
+            if (isset($create['error'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $create['error'],
+                ], 400);
+            }
+
+            if (isset($create['status_code']) && $create['status_code'] === 200) {
+                if (isset($create['status'])) {
+                    if ($create['status']) {
+                        return $this->successResponse($create, 'Arquivos enviados com sucesso!');
+                    }
+                }
+            }
+
+            Storage::disk('driver_tool')->delete($fileName);
+            return response()->json(['success' => false, 'error' => 'Erro ao salvar no banco.'], 400);
 
         } catch (\Exception $error) {
             return response()->json([
