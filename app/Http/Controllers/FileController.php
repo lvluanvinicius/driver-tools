@@ -28,12 +28,27 @@ class FileController extends Controller
     public function index(Request $request, string | null $uuid = null): InertiaResponse
     {
         $integration = new Integration();
-        $data        = $integration->files($request->session()->get('token'), $uuid, $request->only('page', 'paginate', 'search'));
+        $response    = $integration->files($request->session()->get('token'), $uuid, $request->only('page', 'paginate', 'search'));
 
-        return Inertia::render('Files/Index', [
-            'data'        => $data['data'],
-            'breadcrumbs' => $data['breadcrumbs'],
-            'uuid'        => $uuid,
+        if (isset($response['status']) && $response['status'] && isset($response['data'])) {
+            return Inertia::render('Files/Index', [
+                'data'        => $response['data']['data'],
+                'breadcrumbs' => $response['data']['breadcrumbs'],
+                'uuid'        => $uuid,
+            ]);
+        }
+
+        $error = "Houve um erro desconhecido durante a solicitação dos arquivos.";
+        $code  = 400;
+
+        if (isset($response['error'])) {
+            $error = $response['error'];
+            $code  = $response['status_code'];
+        }
+
+        return Inertia::render('Error/Index', [
+            'error' => $error,
+            'code'  => $code,
         ]);
     }
 

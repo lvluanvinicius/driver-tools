@@ -38,8 +38,5 @@ php artisan config:cache
 php artisan view:clear
 php artisan route:clear
 
-chmod 777 -R storage
-chmod 777 -R ${DRIVER_STORAGE_PATH}
-
 # Iniciar a aplicação
 exec "$@"

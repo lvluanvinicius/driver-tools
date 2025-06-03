@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Files;
 use App\Services\Integration;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -19,21 +20,51 @@ class UploadController extends Controller
     {
     }
 
-    public function index(Request $request, string | null $uuid = null): InertiaResponse
+    public function index(Request $request, string | null $uuid = null): InertiaResponse | RedirectResponse
     {
-        $integration = new Integration();
-        $response    = $integration->getFolder($request->session()->get('token'), $uuid);
+        try {
+            $integration = new Integration();
+            $response    = $integration->getFolder($request->session()->get('token'), $uuid);
 
-        $currentFolder = null;
+            $currentFolder = null;
 
-        if (isset($response['status']) && $response['status'] && isset($response['data'])) {
-            $currentFolder = $response['data'];
+            if (isset($response['status']) && $response['status']) {
+
+                if (isset($response['data'])) {
+                    $currentFolder = $response['data'];
+
+                    return Inertia::render('Files/Upload/Index', [
+                        'uuid'   => $uuid,
+                        'folder' => $currentFolder,
+                    ]);
+                }
+
+                return Inertia::render('Files/Upload/Index', [
+                    'uuid'   => $uuid,
+                    'folder' => $currentFolder,
+                ]);
+
+            }
+
+            $error = "Houve um erro desconhecido durante a solicitação.";
+            $code  = 400;
+
+            if (isset($response['error'])) {
+                $error = $response['error'];
+                $code  = $response['status_code'];
+            }
+
+            return Inertia::render('Error/Index', [
+                'error' => $error,
+                'code'  => $code,
+            ]);
+        } catch (\Exception $error) {
+            return Inertia::render('Error/Index', [
+                'error' => $error->getMessage(),
+                'code'  => 500,
+            ]);
+
         }
-
-        return Inertia::render('Files/Upload/Index', [
-            'uuid'   => $uuid,
-            'folder' => $currentFolder,
-        ]);
     }
 
     /**

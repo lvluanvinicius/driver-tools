@@ -167,7 +167,7 @@ class Integration extends LaravelApiClass
             $response = $this->get("/api/cednet-drive/files/$uuid", $params);
 
             if ($this->getStatusCode() === 200 && isset($response['status']) && $response['status']) {
-                return $response['data'];
+                return $response;
             }
 
             if (isset($response['message'])) {
