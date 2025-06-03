@@ -3,7 +3,7 @@ import { FileInterface } from '@/types/file';
 import Dropzone from 'dropzone';
 import { useEffect, useRef } from 'react';
 
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import 'dropzone/dist/dropzone.css';
 import { Undo2 } from 'lucide-react';
 
@@ -18,8 +18,6 @@ export default function FileUploader({
     folder,
     csrf_token,
 }: FileUploaderInterface) {
-    const { props } = usePage();
-
     const dropzoneRef = useRef<HTMLDivElement>(null);
     const dropzoneInstance = useRef<Dropzone | null>(null);
 
