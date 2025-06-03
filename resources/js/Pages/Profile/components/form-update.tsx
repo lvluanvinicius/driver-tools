@@ -16,7 +16,7 @@ export function FormUpdate({ user }: { user: UserInterface }) {
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        put(route('app.profile.update', user.uuid));
+        put(route('app.profile.update', user.id));
     }
 
     return (
