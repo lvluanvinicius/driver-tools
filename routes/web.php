@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\Integration\SignInController;
+use App\Http\Controllers\Integration\SignOutController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
@@ -31,5 +32,5 @@ Route::middleware([Authenticated::class])->as('app.')->group(function () {
 
     Route::resource('profile', ProfileController::class);
 
-    Route::delete('/sign-out', [SignInController::class, 'signOut'])->name('sign-out');
+    Route::delete('/sign-out', [SignOutController::class, 'destroy'])->name('sign-out');
 });
