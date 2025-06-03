@@ -5,6 +5,7 @@ services:
             dockerfile: Dockerfile
             args:
                 - GIT_VERSION=v1.0
+                - APP_NAME="Cednet Driver"
             ssh:
                 - default
         secrets:

@@ -7,6 +7,7 @@ ARG APP_URL=http://localhost
 ARG FRONTEND_URL=http://localhost
 ARG APP_ENV=production
 ARG APP_DEBUG=false
+ARG APP_NAME='Driver Tools'
 
 # Variáveis de ambiente
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -14,7 +15,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     FRONTEND_URL=${FRONTEND_URL} \
     APP_ENV=${APP_ENV} \
     APP_DEBUG=${APP_DEBUG} \
-    GIT_VERSION=${GIT_VERSION}
+    GIT_VERSION=${GIT_VERSION} \
+    APP_NAME=${APP_NAME}
 
 # 1. Instalação de dependências de sistema
 RUN apt-get update && apt-get install -y \
@@ -86,6 +88,7 @@ RUN cp .env.example .env
 # 9. Ajusta variáveis de ambiente no .env
 RUN sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env \
  && sed -i "s|^APP_ENV=.*|APP_ENV=${APP_ENV}|" .env \
+ && sed -i "s|^APP_NAME=.*|APP_NAME=${APP_NAME}|" .env \
  && sed -i "s|^APP_DEBUG=.*|APP_DEBUG=${APP_DEBUG}|" .env
 
 # Instalando dependências.
