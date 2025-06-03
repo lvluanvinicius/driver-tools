@@ -53,6 +53,14 @@ RUN curl -sSL https://packages.sury.org/php/README.txt | bash -x && \
     php8.4-pgsql php8.4-redis && \
     apt-get clean
 
+# Instale o Node.js versão 22
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm@latest \
+    && npm cache clean --force
+
+# Exibe as versões instaladas
+RUN php -v && node -v && npm -v
 
 # 3. Instalação do Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -80,8 +88,15 @@ RUN sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env \
  && sed -i "s|^APP_ENV=.*|APP_ENV=${APP_ENV}|" .env \
  && sed -i "s|^APP_DEBUG=.*|APP_DEBUG=${APP_DEBUG}|" .env
 
+# Instalando dependências.
+RUN npm install --force
+
+
 # 10. Instala dependências do Laravel
 RUN composer install --optimize-autoloader --no-dev
+
+# Criando build do node.
+RUN npm run build
 
 # 11. Permissões e cache
 RUN chown -R www-data:www-data storage bootstrap/cache && \
@@ -100,7 +115,6 @@ EXPOSE 80
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 ENTRYPOINT ["/entrypoint.sh"]
-# CMD ["nginx", "-g", "daemon off;"]
 
 # Entry point via Supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
