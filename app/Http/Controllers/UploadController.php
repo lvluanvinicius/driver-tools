@@ -34,14 +34,16 @@ class UploadController extends Controller
                     $currentFolder = $response['data'];
 
                     return Inertia::render('Files/Upload/Index', [
-                        'uuid'   => $uuid,
-                        'folder' => $currentFolder,
+                        'uuid'       => $uuid,
+                        'folder'     => $currentFolder,
+                        'csrf_token' => csrf_token(),
                     ]);
                 }
 
                 return Inertia::render('Files/Upload/Index', [
-                    'uuid'   => $uuid,
-                    'folder' => $currentFolder,
+                    'uuid'       => $uuid,
+                    'folder'     => $currentFolder,
+                    'csrf_token' => csrf_token(),
                 ]);
 
             }
@@ -55,13 +57,15 @@ class UploadController extends Controller
             }
 
             return Inertia::render('Error/Index', [
-                'error' => $error,
-                'code'  => $code,
+                'error'      => $error,
+                'code'       => $code,
+                'csrf_token' => csrf_token(),
             ]);
         } catch (\Exception $error) {
             return Inertia::render('Error/Index', [
-                'error' => $error->getMessage(),
-                'code'  => 500,
+                'error'      => $error->getMessage(),
+                'code'       => 500,
+                'csrf_token' => csrf_token(),
             ]);
 
         }
