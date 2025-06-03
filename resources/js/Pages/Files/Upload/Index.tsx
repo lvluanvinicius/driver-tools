@@ -19,7 +19,6 @@ export default function FileUploader({
     csrf_token,
 }: FileUploaderInterface) {
     const { props } = usePage();
-    console.log(props);
 
     const dropzoneRef = useRef<HTMLDivElement>(null);
     const dropzoneInstance = useRef<Dropzone | null>(null);
