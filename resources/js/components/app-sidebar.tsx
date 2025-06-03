@@ -1,8 +1,7 @@
-import { Files, HardDrive, Users } from 'lucide-react';
+import { Files, HardDrive } from 'lucide-react';
 import * as React from 'react';
 
 import { NavMain } from '@/components/nav-main';
-import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
@@ -25,18 +24,6 @@ const data = {
             title: 'Arquivos',
             url: route('app.files.index'),
             icon: Files,
-        },
-    ],
-    navSecondary: [
-        // {
-        //     title: 'Configurações',
-        //     url: '#',
-        //     icon: SettingsIcon,
-        // },
-        {
-            title: 'Usuários',
-            url: route('app.users.index'),
-            icon: Users,
         },
     ],
 };
@@ -64,7 +51,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
-                <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
                 <NavUser />
